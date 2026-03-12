@@ -1,0 +1,129 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Segoe UI',sans-serif;
+background:#f8f5f6;
+display:flex;
+justify-content:center;
+padding:40px;
+}
+
+/* CONTENEDOR */
+
+.carrito-container{
+width:900px;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+h1{
+margin-bottom:30px;
+color:#6b4f3a;
+}
+
+/* TABLA */
+
+.tabla-carrito{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.fila{
+display:grid;
+grid-template-columns:2fr 1fr 1fr;
+padding:15px;
+border-bottom:1px solid #eee;
+align-items:center;
+}
+
+.encabezado{
+font-weight:bold;
+background:#f1ebe5;
+border-radius:6px;
+}
+
+.producto{
+font-weight:600;
+}
+
+.precio{
+color:#6b4f3a;
+font-weight:bold;
+}
+
+/* BOTON ELIMINAR */
+
+.btn-eliminar{
+text-decoration:none;
+background:#b08968;
+color:white;
+padding:8px 12px;
+border-radius:5px;
+font-size:13px;
+}
+
+.btn-eliminar:hover{
+background:#9c7556;
+}
+
+/* RESUMEN */
+
+.resumen{
+margin-top:30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.btn-finalizar{
+background:#6b4f3a;
+color:white;
+padding:12px 25px;
+text-decoration:none;
+border-radius:6px;
+font-weight:bold;
+}
+
+/* CARRITO VACIO */
+
+.carrito-vacio{
+text-align:center;
+padding:40px;
+}
+
+.btn-volver{
+display:inline-block;
+margin-top:20px;
+background:#b08968;
+color:white;
+padding:10px 20px;
+text-decoration:none;
+border-radius:6px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+.carrito-container{
+width:100%;
+}
+
+.fila{
+grid-template-columns:1fr;
+gap:5px;
+}
+
+.resumen{
+flex-direction:column;
+gap:15px;
+}
+
+}
