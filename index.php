@@ -1,4 +1,5 @@
-<?php include("includes/conexion.php"); ?>
+<?php session_start();include("includes/conexion.php"); ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -42,10 +43,32 @@ menu.style.display = "flex";
 </div>
 
 <div class="acciones">
-<div class="menu-icon" onclick="toggleCategorias()">☰</div>
+    <div class="carrito-icon" onclick="toggleCarrito()">
+        🛒
+        <span class="contador-carrito" id="contadorCarrito">0</span>
+    </div>
 </div>
 
 </header>
+
+<!-- DRAWER DEL CARRITO -->
+<div id="drawerCarrito" class="drawer-carrito">
+
+<div class="drawer-header">
+<h2>Tu carrito</h2>
+<span onclick="toggleCarrito()" class="cerrar">✖</span>
+</div>
+
+<div class="drawer-body" id="contenidoCarrito">
+<p>Tu carrito está vacío</p>
+</div>
+
+<div class="drawer-footer">
+<h3>Total: $0</h3>
+<a href="carrito.php" class="btn-confirmar">Confirmar pedido</a>
+</div>
+
+</div>
 
 <!-- MENU CATEGORIAS -->
 
@@ -94,10 +117,11 @@ $categoria = isset($row['categoria']) ? $row['categoria'] : "todo";
 
 <?php if($row['stock'] > 0){ ?>
 
-<form action="carrito.php" method="POST">
+<form class="form-agregar">
 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
 <input type="hidden" name="nombre" value="<?php echo $row['nombre']; ?>">
 <input type="hidden" name="precio" value="<?php echo $row['precio']; ?>">
+<input type="hidden" name="imagen" value="<?php echo $row['imagen']; ?>">
 
 <button type="submit" name="agregar" class="btn-agregar">
 Agregar
@@ -139,25 +163,142 @@ target="_blank">
 
 </a>
 
+
+<!-- SCRIPTS -->
 <script>
-function filtrar(categoria){
+document.addEventListener("DOMContentLoaded", function(){
 
-let productos = document.querySelectorAll(".card-producto");
+/* ABRIR / CERRAR CARRITO */
+window.toggleCarrito = function(){
+    document.getElementById("drawerCarrito").classList.toggle("activo");
+}
 
-productos.forEach(function(prod){
+window.abrirCarrito = function(){
+    document.getElementById("drawerCarrito").classList.add("activo");
+}
 
-if(categoria === "todo"){
-prod.style.display = "block";
+window.cerrarCarrito = function(){
+    document.getElementById("drawerCarrito").classList.remove("activo");
 }
-else if(prod.dataset.categoria === categoria){
-prod.style.display = "block";
-}
-else{
-prod.style.display = "none";
-}
+
+/* CERRAR AL HACER CLICK AFUERA */
+document.addEventListener("click", function(e){
+
+    let drawer = document.getElementById("drawerCarrito");
+    let boton = document.querySelector(".carrito-icon");
+
+    if(
+        drawer.classList.contains("activo") &&
+        !drawer.contains(e.target) &&
+        !boton.contains(e.target)
+    ){
+        cerrarCarrito();
+    }
 
 });
 
+/* EVITAR QUE SE CIERRE AL HACER CLICK DENTRO */
+document.getElementById("drawerCarrito").addEventListener("click", function(e){
+    e.stopPropagation();
+});
+
+/* AGREGAR PRODUCTOS */
+document.querySelectorAll(".form-agregar").forEach(form => {
+
+form.addEventListener("submit", function(e){
+e.preventDefault();
+
+let data = new FormData(this);
+data.append("accion", "agregar");
+
+fetch("ajax_carrito.php", {
+method: "POST",
+body: data
+})
+.then(res => res.json())
+.then(data => {
+actualizarCarrito(data);
+abrirCarrito();
+});
+
+});
+
+});
+
+});
+
+/* ACTUALIZAR UI */
+function actualizarCarrito(data){
+
+let contenedor = document.getElementById("contenidoCarrito");
+let totalHTML = document.querySelector(".drawer-footer h3");
+let contador = document.getElementById("contadorCarrito");
+
+contenedor.innerHTML = "";
+
+if(data.carrito.length === 0){
+contenedor.innerHTML = "<p>Tu carrito está vacío</p>";
+return;
+}
+
+data.carrito.forEach((item, index) => {
+
+contenedor.innerHTML += `
+<div class="item-carrito">
+<img src="uploads/${item.imagen}" width="50">
+
+<div>
+<p>${item.nombre}</p>
+<p>$${item.precio} x ${item.cantidad}</p>
+</div>
+
+<div class="controles">
+<button onclick="restarItem(${index})">➖</button>
+<span>${item.cantidad}</span>
+<button onclick="sumarItem(${index})">➕</button>
+</div>
+
+<button onclick="eliminarItem(${index})">❌</button>
+</div>
+`;
+
+});
+
+totalHTML.innerText = "Total: $" + data.total;
+contador.innerText = data.cantidad;
+
+}
+
+/* FUNCIONES AJAX */
+
+function eliminarItem(index){
+fetch("ajax_carrito.php", {
+method: "POST",
+headers: {"Content-Type": "application/x-www-form-urlencoded"},
+body: "accion=eliminar&index=" + index
+})
+.then(res => res.json())
+.then(data => actualizarCarrito(data));
+}
+
+function sumarItem(index){
+fetch("ajax_carrito.php", {
+method: "POST",
+headers: {"Content-Type": "application/x-www-form-urlencoded"},
+body: "accion=sumar&index=" + index
+})
+.then(res => res.json())
+.then(data => actualizarCarrito(data));
+}
+
+function restarItem(index){
+fetch("ajax_carrito.php", {
+method: "POST",
+headers: {"Content-Type": "application/x-www-form-urlencoded"},
+body: "accion=restar&index=" + index
+})
+.then(res => res.json())
+.then(data => actualizarCarrito(data));
 }
 </script>
 

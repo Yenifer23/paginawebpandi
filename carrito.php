@@ -5,18 +5,24 @@ if(!isset($_SESSION['carrito'])){
     $_SESSION['carrito'] = [];
 }
 
-if(isset($_POST['agregar'])){
 
-    $producto = [
-        "id" => $_POST['id'],
-        "nombre" => $_POST['nombre'],
-        "precio" => $_POST['precio'],
-        "cantidad" => 1
-    ];
-
-    $_SESSION['carrito'][] = $producto;
+/* ➕ SUMAR CANTIDAD */
+if(isset($_GET['sumar'])){
+    $_SESSION['carrito'][$_GET['sumar']]['cantidad']++;
 }
 
+/* ➖ RESTAR CANTIDAD */
+if(isset($_GET['restar'])){
+    $i = $_GET['restar'];
+
+    if($_SESSION['carrito'][$i]['cantidad'] > 1){
+        $_SESSION['carrito'][$i]['cantidad']--;
+    } else {
+        unset($_SESSION['carrito'][$i]);
+    }
+}
+
+/* ❌ ELIMINAR */
 if(isset($_GET['eliminar'])){
     unset($_SESSION['carrito'][$_GET['eliminar']]);
 }
@@ -53,23 +59,32 @@ $total = 0;
 <div class="fila encabezado">
 <div>Producto</div>
 <div>Precio</div>
+<div>Cantidad</div>
 <div>Acción</div>
 </div>
 
 <?php foreach($_SESSION['carrito'] as $index => $item){
 
-$total += $item['precio'];
+$subtotal = $item['precio'] * $item['cantidad'];
+$total += $subtotal;
 
 ?>
 
 <div class="fila">
 
-<div class="producto">
+<div class="producto" style="display:flex; align-items:center; gap:10px;">
+<img src="uploads/<?php echo $item['imagen']; ?>" width="60" height="60" style="object-fit:cover;">
 <?php echo $item['nombre']; ?>
 </div>
 
 <div class="precio">
-$<?php echo $item['precio']; ?>
+$<?php echo $subtotal; ?>
+</div>
+
+<div class="cantidad-control">
+<a href="carrito.php?restar=<?php echo $index; ?>">➖</a>
+<span><?php echo $item['cantidad']; ?></span>
+<a href="carrito.php?sumar=<?php echo $index; ?>">➕</a>
 </div>
 
 <div>

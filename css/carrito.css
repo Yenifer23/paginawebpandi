@@ -108,6 +108,25 @@ text-decoration:none;
 border-radius:6px;
 }
 
+/* BOTONES CANTIDAD */
+.cantidad-control{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.cantidad-control a{
+text-decoration:none;
+background:#b08968;
+color:white;
+padding:5px 10px;
+border-radius:5px;
+}
+
+.cantidad-control span{
+font-weight:bold;
+}
+
 /* RESPONSIVE */
 
 @media(max-width:768px){
